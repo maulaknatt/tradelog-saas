@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Trading Journal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="mobile-top-bar">
+        <button id="sidebarToggle" class="mobile-menu-btn" onclick="app.toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <span class="mobile-logo">TradeLog</span>
+        <div style="width: 40px;"></div> <!-- Spacer -->
+    </div>
+
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="app.toggleSidebar(true)"></div>
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header" onclick="location.reload()">
+                <i class="fas fa-chart-line text-success mr-2" style="margin-right: 10px;"></i>
+                TradeLog
+            </div>
+            <nav class="nav-links">
+                <div class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </div>
+                <div class="nav-item" data-view="accounts">
+                    <i class="fas fa-wallet"></i> Accounts
+                </div>
+                <div class="nav-item" data-view="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+                <div class="nav-item" data-view="guide">
+                    <i class="fas fa-book"></i> Guide
+                </div>
+            </nav>
+            <div class="p-6">
+                <div class="nav-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dynamic Content Area -->
+            <div id="view-container">
+                <!-- Dashboard View (Default) -->
+                <div id="dashboard-view" class="view animate-fade">
+                    <header class="flex justify-between items-center mb-4">
+                        <div>
+                            <h1>Dashboard</h1>
+                            <p class="summary-label">Performance overview across all accounts</p>
+                        </div>
+                        <div class="account-selector flex gap-2">
+                            <select id="activeTypeFilter" class="form-control" style="width: auto;">
+                                <option value="all">All Types</option>
+                                <option value="Standard">Standard</option>
+                                <option value="Cent">Cent</option>
+                            </select>
+                            <select id="activeAccountSelect" class="form-control">
+                                <option value="all">All Accounts</option>
+                            </select>
+                        </div>
+                    </header>
+
+                    <!-- Summary Cards -->
+                    <div class="stats-grid">
+                        <div class="card summary-card">
+                            <div class="summary-label">Total Balance</div>
+                            <div class="summary-value" id="stat-total-balance">$0.00</div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="summary-label">Growth</div>
+                            <div class="summary-value text-success" id="stat-total-growth">0.00%</div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="summary-label">Win Rate</div>
+                            <div class="summary-value" id="stat-winrate">0.00%</div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="summary-label">Total Trades</div>
+                            <div class="summary-value" id="stat-trades">0</div>
+                        </div>
+                        <div class="card summary-card">
+                            <div class="summary-label">Max Drawdown</div>
+                            <div class="summary-value text-danger" id="stat-drawdown">0.00%</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Area -->
+                    <div class="charts-grid">
+                        <div class="card p-6">
+                            <h3 class="mb-4">Equity Curve</h3>
+                            <div style="height: 300px;">
+                                <canvas id="equityChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card p-6">
+                            <h3 class="mb-4">Win vs Loss</h3>
+                            <div style="height: 300px; display: flex; justify-content: center;">
+                                <canvas id="winLossChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card p-6">
+                        <h3 class="mb-4">Recent Trades</h3>
+                        <div class="table-container">
+                            <table id="recentTradesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Pair</th>
+                                        <th>Dir</th>
+                                        <th>Lot</th>
+                                        <th>Entry</th>
+                                        <th>Close</th>
+                                        <th>Pips</th>
+                                        <th>Result</th>
+                                        <th>Growth</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accounts List View -->
+                <div id="accounts-view" class="view animate-fade" style="display: none;">
+                    <header class="flex justify-between items-center mb-4">
+                        <h1>Trading Accounts</h1>
+                        <button class="btn btn-primary" onclick="app.showAccountModal()">
+                            <i class="fas fa-plus"></i> Add Account
+                        </button>
+                    </header>
+                    <div class="summary-grid" id="accountsList">
+                        <!-- Account cards with Detail, Edit, Delete -->
+                    </div>
+                </div>
+
+                <!-- Account Detail (Journal) View -->
+                <div id="journal-view" class="view animate-fade" style="display: none;">
+                    <div class="journal-header">
+                        <button class="back-btn" onclick="app.switchView('accounts')">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h1 id="journalAccountName">Account Journal</h1>
+                            <p class="summary-label" id="journalAccountStats">Account Stats</p>
+                        </div>
+                    </div>
+
+                    <header class="flex justify-between items-center mb-4">
+                        <h3>Trade History</h3>
+                        <button class="btn btn-primary" onclick="app.showTradeModal()">
+                            <i class="fas fa-plus"></i> New Trade
+                        </button>
+                    </header>
+
+                    <div class="card p-6">
+                        <div class="table-container scroll-y">
+                            <table id="journalTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Pair</th>
+                                        <th>TF</th>
+                                        <th>Dir</th>
+                                        <th>Lot</th>
+                                        <th>Entry</th>
+                                        <th>Close</th>
+                                        <th>Pips</th>
+                                        <th>Result ($)</th>
+                                        <th>RR</th>
+                                        <th>Emotion</th>
+                                        <th style="min-width: 100px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Bar -->
+                        <div class="pagination-bar">
+                            <div class="items-per-page">
+                                Show
+                                <select id="itemsPerPage" onchange="app.changeItemsPerPage(this.value)">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                                entries
+                            </div>
+                            <div class="pagination-controls">
+                                <span class="pagination-info" id="paginationInfo">Page 1 of 1</span>
+                                <button class="btn btn-outline page-btn" id="prevPage" onclick="app.changePage(-1)">
+                                    <i class="fas fa-chevron-left"></i> Prev
+                                </button>
+                                <button class="btn btn-outline page-btn" id="nextPage" onclick="app.changePage(1)">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-view" class="view animate-fade" style="display: none;">
+                    <h1>Settings</h1>
+                    <div class="card p-6 mt-4">
+                        <h3 class="mb-4">Profile</h3>
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" class="form-control" value="Trader Admin">
+                        </div>
+                        <button class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+
+                <div id="guide-view" class="view animate-fade" style="display: none;">
+                    <h1>Cara Penggunaan</h1>
+                    <div class="card p-6 mt-4">
+                        <div class="guide-content">
+                            <section class="mb-6">
+                                <h3 class="text-success mb-2"><i class="fas fa-plus-circle"></i> Membuat Akun</h3>
+                                <p>Buka menu <b>Accounts</b> dan klik <b>Add Account</b>. Pilih tipe akun (Standard atau
+                                    Cent) dan isi saldo awal Anda.</p>
+                            </section>
+
+                            <section class="mb-6">
+                                <h3 class="text-success mb-2"><i class="fas fa-edit"></i> Mencatat Trade (XAUUSD)</h3>
+                                <p>Masuk ke Jurnal akun Anda, klik <b>New Trade</b>. Isi harga Entry dan Close. Sistem
+                                    akan otomatis menghitung <b>Pips</b> (1 pip = 0.10) dan <b>Profit</b>.</p>
+                            </section>
+
+                            <section class="mb-6">
+                                <h3 class="text-success mb-2"><i class="fas fa-calculator"></i> Kalkulasi Otomatis</h3>
+                                <ul>
+                                    <li><b>Pips:</b> (Close - Entry) * 10</li>
+                                    <li><b>Result Standard:</b> Move * Lot * 100</li>
+                                    <li><b>Result Cent:</b> Move * Lot * 1</li>
+                                    <li><b>RR Ratio:</b> Berdasarkan SL/TP yang Anda masukkan.</li>
+                                </ul>
+                            </section>
+
+                            <section>
+                                <h3 class="text-success mb-2"><i class="fas fa-mobile-alt"></i> Navigasi Mobile</h3>
+                                <p>Gunakan tombol garis tiga di pojok kiri atas untuk membuka menu. Ketuk area luar menu
+                                    untuk menutupnya.</p>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Unified Modals -->
+    <div id="accountModal" class="modal">
+        <div class="card modal-content p-6">
+            <h2 class="mb-4" id="accountModalTitle">Add New Account</h2>
+            <form id="accountForm">
+                <input type="hidden" id="editAccountId">
+                <div class="form-group">
+                    <label>Account Name</label>
+                    <input type="text" id="accName" class="form-control" placeholder="e.g. Gold Scalping" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <select id="accType" class="form-control" required>
+                        <option value="Standard">Standard (USD)</option>
+                        <option value="Cent">Cent (USC)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Initial Balance</label>
+                    <input type="number" id="accBalance" class="form-control" placeholder="1000" step="any" required>
+                </div>
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="button" class="btn btn-outline"
+                        onclick="app.closeModal('accountModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="accountModalSubmit">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="tradeModal" class="modal">
+        <div class="card modal-content p-6">
+            <h2 class="mb-4" id="tradeModalTitle">Add New Trade</h2>
+            <form id="tradeForm">
+                <input type="hidden" id="editTradeId">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="tradeDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pair</label>
+                        <input type="text" id="tradePair" class="form-control" placeholder="XAUUSD" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Timeframe</label>
+                        <input type="text" id="tradeTF" class="form-control" placeholder="M15" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Direction</label>
+                        <select id="tradeDir" class="form-control">
+                            <option value="Buy">Buy</option>
+                            <option value="Sell">Sell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Entry Price</label>
+                        <input type="number" id="tradeEntry" class="form-control" step="any"
+                            oninput="app.updateTradeFormCalculations()" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Close Price</label>
+                        <input type="number" id="tradeClose" class="form-control" step="any"
+                            oninput="app.updateTradeFormCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <label>Pips</label>
+                        <input type="number" id="tradePips" class="form-control" step="any" readonly placeholder="Auto">
+                    </div>
+                    <div class="form-group">
+                        <label>SL</label>
+                        <input type="number" id="tradeSL" class="form-control" step="any"
+                            oninput="app.updateTradeFormCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <label>TP</label>
+                        <input type="number" id="tradeTP" class="form-control" step="any"
+                            oninput="app.updateTradeFormCalculations()">
+                    </div>
+                    <div class="form-group">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="mb-0">Result ($)</label>
+                            <label class="flex items-center gap-1"
+                                style="font-size: 0.75rem; cursor: pointer; color: var(--secondary);">
+                                <input type="checkbox" id="tradeManualResult" onchange="app.toggleResultMode()"> Manual
+                            </label>
+                        </div>
+                        <input type="number" id="tradeResult" class="form-control" step="any" readonly
+                            placeholder="Auto">
+                    </div>
+                    <div class="form-group">
+                        <label>Lot</label>
+                        <input type="number" id="tradeLot" class="form-control" step="any"
+                            oninput="app.updateTradeFormCalculations()" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Risk %</label>
+                        <input type="number" id="tradeRisk" class="form-control" step="any">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Emotion</label>
+                    <input type="text" id="tradeEmotion" class="form-control" placeholder="Calm, greedy, etc.">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="tradeNotes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="button" class="btn btn-outline" onclick="app.closeModal('tradeModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="tradeModalSubmit">Save Trade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
