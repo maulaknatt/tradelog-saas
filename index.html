@@ -1,39 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Trading Journal</title>
+    <meta name="description"
+        content="TradeLog — Professional trading journal for XAUUSD traders. Sign in to access your dashboard.">
+    <title>Sign In | TradeLog</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+
 <body>
     <div class="auth-container">
         <div class="card auth-card animate-fade">
-            <div class="auth-logo">TradeLog</div>
-            <h2 class="mb-4">Welcome back</h2>
-            <p class="summary-label mb-4">Enter your details to access your journal</p>
-            
-            <form id="loginForm">
+
+            <div class="auth-logo">
+                <i class="fas fa-chart-candlestick"></i>
+                TradeLog
+            </div>
+
+            <h2>Welcome back</h2>
+            <p class="text-secondary" style="text-align:center;margin-bottom:2rem;font-size:0.875rem;">
+                Sign in to access your trading journal
+            </p>
+
+            <form id="loginForm" novalidate>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control" placeholder="admin" required>
+                    <input type="text" id="username" class="form-control" placeholder="e.g. trader01"
+                        autocomplete="username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••"
+                        autocomplete="current-password" required>
                 </div>
-                
-                <button type="submit" class="btn btn-primary w-full p-6" style="margin-top: 1rem;">
-                    Sign In
+
+                <button type="submit" class="btn btn-primary w-full"
+                    style="margin-top:1.25rem;padding:0.75rem 1rem;font-size:0.9375rem;">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
                 </button>
             </form>
-            
-            <p class="summary-label" style="margin-top: 2rem;">
-                Don't have an account? <span class="text-success" style="cursor:pointer">Sign up</span>
+
+            <p class="text-secondary" style="text-align:center;margin-top:2rem;font-size:0.8125rem;">
+                Any username works — your data is stored locally.
             </p>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="js/storage.js"></script>
+    <script>
+        // Simple login: just validate non-empty, save, redirect
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-redirect if already logged in
+            const state = Storage.load();
+            if (state && state.user) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            document.getElementById('loginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value.trim();
+                if (!username) return;
+                const state = Storage.load();
+                state.user = { username };
+                Storage.save(state);
+                window.location.href = 'dashboard.html';
+            });
+        });
+    </script>
 </body>
+
 </html>

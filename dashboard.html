@@ -4,117 +4,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Trading Journal</title>
+    <meta name="description"
+        content="TradeLog — Professional trading journal for XAUUSD traders. Track your trades, analyse performance, and grow your edge.">
+    <title>Dashboard | TradeLog</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
+    <!-- Mobile Top Bar -->
     <div class="mobile-top-bar">
-        <button id="sidebarToggle" class="mobile-menu-btn" onclick="app.toggleSidebar()">
+        <button id="sidebarToggle" class="mobile-menu-btn" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
         </button>
-        <span class="mobile-logo">TradeLog</span>
-        <div style="width: 40px;"></div> <!-- Spacer -->
+        <span class="mobile-logo">
+            <i class="fas fa-chart-candlestick" style="color:var(--accent);margin-right:6px;"></i>TradeLog
+        </span>
+        <div style="width:40px;"></div>
     </div>
 
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="app.toggleSidebar(true)"></div>
+    <!-- Sidebar Backdrop -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
     <div class="app-shell">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header" onclick="location.reload()">
-                <i class="fas fa-chart-line text-success mr-2" style="margin-right: 10px;"></i>
-                TradeLog
+        <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+        <aside class="sidebar" role="navigation" aria-label="Main navigation">
+            <div class="sidebar-brand" onclick="app.switchView('dashboard')" title="Back to Dashboard">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-chart-candlestick"></i>
+                </div>
+                <span class="sidebar-brand-name">TradeLog</span>
             </div>
+
             <nav class="nav-links">
-                <div class="nav-item active" data-view="dashboard">
-                    <i class="fas fa-th-large"></i> Dashboard
+                <div class="nav-section-label">Main</div>
+                <div class="nav-item active" data-view="dashboard" id="nav-dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
                 </div>
-                <div class="nav-item" data-view="accounts">
-                    <i class="fas fa-wallet"></i> Accounts
+                <div class="nav-item" data-view="accounts" id="nav-accounts">
+                    <i class="fas fa-wallet"></i>
+                    <span>Accounts</span>
                 </div>
-                <div class="nav-item" data-view="settings">
-                    <i class="fas fa-cog"></i> Settings
+
+                <div class="nav-section-label" style="margin-top:1rem;">System</div>
+                <div class="nav-item" data-view="settings" id="nav-settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
                 </div>
-                <div class="nav-item" data-view="guide">
-                    <i class="fas fa-book"></i> Guide
+                <div class="nav-item" data-view="guide" id="nav-guide">
+                    <i class="fas fa-book-open"></i>
+                    <span>Guide</span>
                 </div>
             </nav>
-            <div class="p-6">
-                <div class="nav-item" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-username" id="sidebarUsername">Trader</div>
+                        <div class="sidebar-user-role">Pro Trader</div>
+                    </div>
                 </div>
+                <button class="nav-item" id="logoutBtn"
+                    style="width:100%;border:none;background:none;text-align:left;margin-top:0.5rem;" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
         <main class="main-content">
-            <!-- Dynamic Content Area -->
             <div id="view-container">
-                <!-- Dashboard View (Default) -->
-                <div id="dashboard-view" class="view animate-fade">
-                    <header class="flex justify-between items-center mb-4">
-                        <div>
-                            <h1>Dashboard</h1>
-                            <p class="summary-label">Performance overview across all accounts</p>
+
+                <!-- ─────────────── DASHBOARD VIEW ─────────────── -->
+                <div id="dashboard-view" class="view">
+                    <header class="view-header">
+                        <div class="view-header-left">
+                            <h1 class="view-title">Dashboard</h1>
+                            <p class="view-subtitle">Performance overview across all accounts</p>
                         </div>
-                        <div class="account-selector flex gap-2">
-                            <select id="activeTypeFilter" class="form-control" style="width: auto;">
-                                <option value="all">All Types</option>
-                                <option value="Standard">Standard</option>
-                                <option value="Cent">Cent</option>
-                            </select>
-                            <select id="activeAccountSelect" class="form-control">
-                                <option value="all">All Accounts</option>
-                            </select>
+                        <div class="header-actions">
+                            <div class="filter-group">
+                                <span class="filter-label"><i class="fas fa-filter"></i></span>
+                                <select id="activeTypeFilter" class="form-control select-sm"
+                                    aria-label="Filter by account type">
+                                    <option value="all">All Types</option>
+                                    <option value="Standard">Standard (USD)</option>
+                                    <option value="Cent">Cent (USC)</option>
+                                </select>
+                                <select id="activeAccountSelect" class="form-control select-sm"
+                                    aria-label="Filter by account">
+                                    <option value="all">All Accounts</option>
+                                </select>
+                            </div>
                         </div>
                     </header>
 
-                    <!-- Summary Cards -->
+                    <!-- KPI Grid — 3 rows × 3 columns -->
                     <div class="stats-grid">
-                        <div class="card summary-card">
-                            <div class="summary-label">Total Balance</div>
-                            <div class="summary-value" id="stat-total-balance">$0.00</div>
+
+                        <!-- Row 1: Financial Summary -->
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-blue"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Total Balance</div>
+                                <div class="kpi-value" id="stat-total-balance">$0.00</div>
+                            </div>
                         </div>
-                        <div class="card summary-card">
-                            <div class="summary-label">Growth</div>
-                            <div class="summary-value text-success" id="stat-total-growth">0.00%</div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-green"><i class="fas fa-chart-line"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Growth</div>
+                                <div class="kpi-value text-success" id="stat-total-growth">+0.00%</div>
+                            </div>
                         </div>
-                        <div class="card summary-card">
-                            <div class="summary-label">Win Rate</div>
-                            <div class="summary-value" id="stat-winrate">0.00%</div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-teal"><i class="fas fa-scale-balanced"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Profit Factor</div>
+                                <div class="kpi-value" id="stat-profit-factor">0.00</div>
+                            </div>
                         </div>
-                        <div class="card summary-card">
-                            <div class="summary-label">Total Trades</div>
-                            <div class="summary-value" id="stat-trades">0</div>
+
+                        <!-- Row 2: Performance -->
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-purple"><i class="fas fa-trophy"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Win Rate</div>
+                                <div class="kpi-value" id="stat-winrate">0.0%</div>
+                            </div>
                         </div>
-                        <div class="card summary-card">
-                            <div class="summary-label">Max Drawdown</div>
-                            <div class="summary-value text-danger" id="stat-drawdown">0.00%</div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-orange"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Total Trades</div>
+                                <div class="kpi-value" id="stat-trades">0</div>
+                            </div>
                         </div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-blue"><i class="fas fa-crosshairs"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Avg R:R</div>
+                                <div class="kpi-value" id="stat-avg-rr">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Risk -->
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-red"><i class="fas fa-arrow-trend-down"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Max Drawdown</div>
+                                <div class="kpi-value text-danger" id="stat-drawdown">0.00%</div>
+                            </div>
+                        </div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-green"><i class="fas fa-fire"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Best Win Streak</div>
+                                <div class="kpi-value text-success" id="stat-win-streak">0</div>
+                            </div>
+                        </div>
+                        <div class="card kpi-card">
+                            <div class="kpi-icon kpi-icon-red"><i class="fas fa-skull"></i></div>
+                            <div class="kpi-body">
+                                <div class="kpi-label">Worst Loss Streak</div>
+                                <div class="kpi-value text-danger" id="stat-loss-streak">0</div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <!-- Charts Area -->
+                    <!-- Charts -->
                     <div class="charts-grid">
-                        <div class="card p-6">
-                            <h3 class="mb-4">Equity Curve</h3>
-                            <div style="height: 300px;">
+                        <div class="card chart-card">
+                            <div class="chart-card-header">
+                                <h3>Equity Curve</h3>
+                                <span class="chart-label">Cumulative balance over time</span>
+                            </div>
+                            <div class="chart-wrapper">
                                 <canvas id="equityChart"></canvas>
                             </div>
                         </div>
-                        <div class="card p-6">
-                            <h3 class="mb-4">Win vs Loss</h3>
-                            <div style="height: 300px; display: flex; justify-content: center;">
-                                <canvas id="winLossChart"></canvas>
+                        <div class="card chart-card">
+                            <div class="chart-card-header">
+                                <h3>Win / Loss</h3>
+                                <span class="chart-label">Trade outcome distribution</span>
+                            </div>
+                            <div class="chart-wrapper" style="display:flex;align-items:center;justify-content:center;">
+                                <canvas id="winLossChart" style="max-width:260px;max-height:260px;"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
-                    <div class="card p-6">
-                        <h3 class="mb-4">Recent Trades</h3>
+                    <!-- Monthly Performance -->
+                    <div class="card p-section mb-6">
+                        <div class="section-header">
+                            <h3>Monthly Performance</h3>
+                            <span class="chart-label">Last 6 months</span>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Trades</th>
+                                        <th>Net P&L</th>
+                                        <th>Win Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyPerformanceBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted" style="padding:2rem;">No data
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Recent Trades -->
+                    <div class="card p-section">
+                        <div class="section-header mb-4">
+                            <h3>Recent Trades</h3>
+                            <span class="chart-label">Latest 8 trades</span>
+                        </div>
                         <div class="table-container">
                             <table id="recentTradesTable">
                                 <thead>
@@ -127,51 +247,85 @@
                                         <th>Close</th>
                                         <th>Pips</th>
                                         <th>Result</th>
-                                        <th>Growth</th>
+                                        <th>Account</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- Dynamic content -->
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+                <!-- /dashboard-view -->
 
-                <!-- Accounts List View -->
-                <div id="accounts-view" class="view animate-fade" style="display: none;">
-                    <header class="flex justify-between items-center mb-4">
-                        <h1>Trading Accounts</h1>
-                        <button class="btn btn-primary" onclick="app.showAccountModal()">
-                            <i class="fas fa-plus"></i> Add Account
+                <!-- ─────────────── ACCOUNTS VIEW ─────────────── -->
+                <div id="accounts-view" class="view" style="display:none;">
+                    <header class="view-header">
+                        <div>
+                            <h1 class="view-title">Trading Accounts</h1>
+                            <p class="view-subtitle">Manage your Standard and Cent accounts</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="app.showAccountModal()" id="addAccountBtn">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Account</span>
                         </button>
                     </header>
-                    <div class="summary-grid" id="accountsList">
-                        <!-- Account cards with Detail, Edit, Delete -->
-                    </div>
+                    <div class="summary-grid" id="accountsList"></div>
                 </div>
+                <!-- /accounts-view -->
 
-                <!-- Account Detail (Journal) View -->
-                <div id="journal-view" class="view animate-fade" style="display: none;">
-                    <div class="journal-header">
-                        <button class="back-btn" onclick="app.switchView('accounts')">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <div>
-                            <h1 id="journalAccountName">Account Journal</h1>
-                            <p class="summary-label" id="journalAccountStats">Account Stats</p>
+                <!-- ─────────────── JOURNAL VIEW ─────────────── -->
+                <div id="journal-view" class="view" style="display:none;">
+                    <!-- Journal Stats Bar -->
+                    <div class="journal-stats-bar card">
+                        <div class="journal-back-row">
+                            <button class="back-btn" onclick="app.switchView('accounts')" aria-label="Back to accounts">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="journal-title-block">
+                                <h1 id="journalAccountName">Account Journal</h1>
+                                <span class="badge badge-secondary" id="journalBadgeType">Standard</span>
+                            </div>
+                        </div>
+                        <div class="journal-kpi-row">
+                            <div class="journal-kpi">
+                                <span class="journal-kpi-label">Balance</span>
+                                <span class="journal-kpi-value" id="journalBalance">$0.00</span>
+                            </div>
+                            <div class="journal-kpi">
+                                <span class="journal-kpi-label">Growth</span>
+                                <span class="journal-kpi-value" id="journalGrowthVal">0.00%</span>
+                            </div>
+                            <div class="journal-kpi">
+                                <span class="journal-kpi-label">Win Rate</span>
+                                <span class="journal-kpi-value" id="journalWinrate">0%</span>
+                            </div>
+                            <div class="journal-kpi">
+                                <span class="journal-kpi-label">Total</span>
+                                <span class="journal-kpi-value" id="journalTradeCount">0 trades</span>
+                            </div>
                         </div>
                     </div>
 
-                    <header class="flex justify-between items-center mb-4">
-                        <h3>Trade History</h3>
-                        <button class="btn btn-primary" onclick="app.showTradeModal()">
-                            <i class="fas fa-plus"></i> New Trade
-                        </button>
-                    </header>
+                    <!-- Journal Equity Mini Chart -->
+                    <div class="card chart-card" style="margin-bottom:1.5rem;">
+                        <div class="chart-card-header">
+                            <h3>Balance Curve</h3>
+                        </div>
+                        <div class="chart-wrapper" style="height:180px;">
+                            <canvas id="journalEquityChart"></canvas>
+                        </div>
+                    </div>
 
-                    <div class="card p-6">
-                        <div class="table-container scroll-y">
+                    <!-- Trade Table -->
+                    <div class="card">
+                        <div class="journal-table-header">
+                            <h3>Trade History</h3>
+                            <button class="btn btn-primary" onclick="app.showTradeModal()" id="newTradeBtn">
+                                <i class="fas fa-plus"></i>
+                                <span>New Trade</span>
+                            </button>
+                        </div>
+                        <div class="table-container">
                             <table id="journalTable">
                                 <thead>
                                     <tr>
@@ -183,23 +337,24 @@
                                         <th>Entry</th>
                                         <th>Close</th>
                                         <th>Pips</th>
-                                        <th>Result ($)</th>
+                                        <th>Result</th>
                                         <th>RR</th>
+                                        <th>SL</th>
+                                        <th>TP</th>
                                         <th>Emotion</th>
-                                        <th style="min-width: 100px;">Actions</th>
+                                        <th style="min-width:90px;">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- Dynamic content -->
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
 
-                        <!-- Pagination Bar -->
+                        <!-- Pagination -->
                         <div class="pagination-bar">
                             <div class="items-per-page">
                                 Show
-                                <select id="itemsPerPage" onchange="app.changeItemsPerPage(this.value)">
+                                <select id="itemsPerPage" onchange="app.changeItemsPerPage(this.value)"
+                                    aria-label="Items per page">
                                     <option value="10">10</option>
                                     <option value="20">20</option>
                                     <option value="50">50</option>
@@ -208,185 +363,320 @@
                             </div>
                             <div class="pagination-controls">
                                 <span class="pagination-info" id="paginationInfo">Page 1 of 1</span>
-                                <button class="btn btn-outline page-btn" id="prevPage" onclick="app.changePage(-1)">
-                                    <i class="fas fa-chevron-left"></i> Prev
+                                <button class="btn btn-outline page-btn" id="prevPage" onclick="app.changePage(-1)"
+                                    aria-label="Previous page">
+                                    <i class="fas fa-chevron-left"></i>
                                 </button>
-                                <button class="btn btn-outline page-btn" id="nextPage" onclick="app.changePage(1)">
-                                    Next <i class="fas fa-chevron-right"></i>
+                                <button class="btn btn-outline page-btn" id="nextPage" onclick="app.changePage(1)"
+                                    aria-label="Next page">
+                                    <i class="fas fa-chevron-right"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- /journal-view -->
 
-                <div id="settings-view" class="view animate-fade" style="display: none;">
-                    <h1>Settings</h1>
-                    <div class="card p-6 mt-4">
-                        <h3 class="mb-4">Profile</h3>
-                        <div class="form-group">
-                            <label>Display Name</label>
-                            <input type="text" class="form-control" value="Trader Admin">
+                <!-- ─────────────── SETTINGS VIEW ─────────────── -->
+                <div id="settings-view" class="view" style="display:none;">
+                    <header class="view-header">
+                        <div>
+                            <h1 class="view-title">Settings</h1>
+                            <p class="view-subtitle">Manage your account and data</p>
                         </div>
-                        <button class="btn btn-primary">Save Changes</button>
+                    </header>
+
+                    <div class="settings-grid">
+                        <!-- Profile Card -->
+                        <div class="card p-section">
+                            <h3 class="mb-4"><i class="fas fa-user-circle"
+                                    style="color:var(--accent);margin-right:8px;"></i>Profile</h3>
+                            <div class="form-group">
+                                <label>Logged in as</label>
+                                <div class="form-control"
+                                    style="display:flex;align-items:center;gap:0.75rem;cursor:default;">
+                                    <div class="sidebar-avatar" style="width:28px;height:28px;font-size:0.75rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span id="settingsUsername">trader</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Import/Export Card -->
+                        <div class="card p-section">
+                            <h3 class="mb-4"><i class="fas fa-database"
+                                    style="color:var(--accent);margin-right:8px;"></i>Data Management</h3>
+                            <p class="text-muted mb-4" style="font-size:0.875rem;">
+                                Export your full trade history as a JSON backup file, or import a previous backup.
+                            </p>
+                            <div class="flex gap-2" style="flex-wrap:wrap;">
+                                <button class="btn btn-primary" id="exportBtn">
+                                    <i class="fas fa-download"></i> Export Backup
+                                </button>
+                                <button class="btn btn-outline" id="importBtn">
+                                    <i class="fas fa-upload"></i> Import Backup
+                                </button>
+                                <input type="file" id="importFile" accept=".json" style="display:none;">
+                            </div>
+                        </div>
+
+                        <!-- Calculation Reference Card -->
+                        <div class="card p-section">
+                            <h3 class="mb-4"><i class="fas fa-calculator"
+                                    style="color:var(--accent);margin-right:8px;"></i>Calculation Reference</h3>
+                            <div class="calc-ref">
+                                <div class="calc-ref-row">
+                                    <span class="calc-ref-label">Pips (XAUUSD)</span>
+                                    <span class="calc-ref-formula">1 pip = 0.10 │ BUY: (close−entry)÷0.10 │ SELL:
+                                        (entry−close)÷0.10</span>
+                                </div>
+                                <div class="calc-ref-row">
+                                    <span class="calc-ref-label">Result (Standard)</span>
+                                    <span class="calc-ref-formula">move × lot × 100</span>
+                                </div>
+                                <div class="calc-ref-row">
+                                    <span class="calc-ref-label">Result (Cent)</span>
+                                    <span class="calc-ref-formula">move × lot × 1</span>
+                                </div>
+                                <div class="calc-ref-row">
+                                    <span class="calc-ref-label">Growth %</span>
+                                    <span class="calc-ref-formula">((balance − initial) ÷ initial) × 100</span>
+                                </div>
+                                <div class="calc-ref-row">
+                                    <span class="calc-ref-label">R:R Ratio</span>
+                                    <span class="calc-ref-formula">|TP − entry| ÷ |SL − entry|</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!-- /settings-view -->
 
-                <div id="guide-view" class="view animate-fade" style="display: none;">
-                    <h1>Cara Penggunaan</h1>
-                    <div class="card p-6 mt-4">
-                        <div class="guide-content">
-                            <section class="mb-6">
-                                <h3 class="text-success mb-2"><i class="fas fa-plus-circle"></i> Membuat Akun</h3>
-                                <p>Buka menu <b>Accounts</b> dan klik <b>Add Account</b>. Pilih tipe akun (Standard atau
-                                    Cent) dan isi saldo awal Anda.</p>
-                            </section>
+                <!-- ─────────────── GUIDE VIEW ─────────────── -->
+                <div id="guide-view" class="view" style="display:none;">
+                    <header class="view-header">
+                        <div>
+                            <h1 class="view-title">User Guide</h1>
+                            <p class="view-subtitle">How to use TradeLog effectively</p>
+                        </div>
+                    </header>
 
-                            <section class="mb-6">
-                                <h3 class="text-success mb-2"><i class="fas fa-edit"></i> Mencatat Trade (XAUUSD)</h3>
-                                <p>Masuk ke Jurnal akun Anda, klik <b>New Trade</b>. Isi harga Entry dan Close. Sistem
-                                    akan otomatis menghitung <b>Pips</b> (1 pip = 0.10) dan <b>Profit</b>.</p>
-                            </section>
-
-                            <section class="mb-6">
-                                <h3 class="text-success mb-2"><i class="fas fa-calculator"></i> Kalkulasi Otomatis</h3>
-                                <ul>
-                                    <li><b>Pips:</b> (Close - Entry) * 10</li>
-                                    <li><b>Result Standard:</b> Move * Lot * 100</li>
-                                    <li><b>Result Cent:</b> Move * Lot * 1</li>
-                                    <li><b>RR Ratio:</b> Berdasarkan SL/TP yang Anda masukkan.</li>
-                                </ul>
-                            </section>
-
-                            <section>
-                                <h3 class="text-success mb-2"><i class="fas fa-mobile-alt"></i> Navigasi Mobile</h3>
-                                <p>Gunakan tombol garis tiga di pojok kiri atas untuk membuka menu. Ketuk area luar menu
-                                    untuk menutupnya.</p>
-                            </section>
+                    <div class="guide-grid">
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">01</span> Create an Account</h3>
+                            <p>Navigate to <strong>Accounts</strong> and click <strong>Add Account</strong>. Choose
+                                between <em>Standard (USD)</em> for normal accounts or <em>Cent (USC)</em> for cent
+                                accounts, then enter your initial deposit.</p>
+                        </div>
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">02</span> Record Your Trades</h3>
+                            <p>Open a journal from the Accounts page. Click <strong>New Trade</strong>. Enter your Entry
+                                price — the Close field unlocks after. Pips and Result calculate automatically.</p>
+                        </div>
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">03</span> SL / TP &amp; R:R</h3>
+                            <p>Enter your <em>Stop Loss</em> and <em>Take Profit</em> prices. The R:R ratio
+                                auto-calculates. Risk 1 = |entry − SL|, Reward = |TP − entry|.</p>
+                        </div>
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">04</span> Backup Your Data</h3>
+                            <p>All data is saved in your browser&apos;s localStorage. Use <strong>Settings &rarr; Export
+                                    Backup</strong> to download a JSON file. You can import it back anytime.</p>
+                        </div>
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">05</span> Mobile Navigation</h3>
+                            <p>On mobile, tap the ☰ icon in the top bar to open the sidebar menu. Tap outside the menu
+                                to close it. All views are fully touch-optimised.</p>
+                        </div>
+                        <div class="card p-section">
+                            <h3 class="guide-step-title"><span class="step-num">06</span> Manual Result Override</h3>
+                            <p>If you need to enter a custom P&amp;L (e.g. swap deducted), tick the
+                                <strong>Manual</strong> checkbox next to the Result field and type your value directly.
+                            </p>
                         </div>
                     </div>
                 </div>
-            </div>
+                <!-- /guide-view -->
+
+            </div><!-- /view-container -->
         </main>
-    </div>
+    </div><!-- /app-shell -->
 
-    <!-- Unified Modals -->
-    <div id="accountModal" class="modal">
-        <div class="card modal-content p-6">
-            <h2 class="mb-4" id="accountModalTitle">Add New Account</h2>
-            <form id="accountForm">
+    <!-- ═══════════════════════ MODALS ═══════════════════════ -->
+
+    <!-- Account Modal -->
+    <div id="accountModal" class="modal" role="dialog" aria-labelledby="accountModalTitle" aria-modal="true">
+        <div class="card modal-content">
+            <div class="modal-header">
+                <h2 id="accountModalTitle">Add New Account</h2>
+                <button class="modal-close-btn" onclick="UI.closeModal('accountModal')" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="accountForm" class="modal-body" novalidate>
                 <input type="hidden" id="editAccountId">
                 <div class="form-group">
-                    <label>Account Name</label>
-                    <input type="text" id="accName" class="form-control" placeholder="e.g. Gold Scalping" required>
+                    <label for="accName">Account Name *</label>
+                    <input type="text" id="accName" class="form-control" placeholder="e.g. Gold Scalper 01" required>
                 </div>
                 <div class="form-group">
-                    <label>Account Type</label>
+                    <label for="accType">Account Type *</label>
                     <select id="accType" class="form-control" required>
                         <option value="Standard">Standard (USD)</option>
                         <option value="Cent">Cent (USC)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Initial Balance</label>
-                    <input type="number" id="accBalance" class="form-control" placeholder="1000" step="any" required>
+                    <label for="accBalance">Initial Deposit *</label>
+                    <div class="input-with-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="accBalance" class="form-control" placeholder="1000" step="0.01" min="0"
+                            required>
+                    </div>
                 </div>
-                <div class="flex gap-2" style="margin-top: 2rem;">
+                <div class="modal-actions">
                     <button type="button" class="btn btn-outline"
-                        onclick="app.closeModal('accountModal')">Cancel</button>
+                        onclick="UI.closeModal('accountModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="accountModalSubmit">Create Account</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="tradeModal" class="modal">
-        <div class="card modal-content p-6">
-            <h2 class="mb-4" id="tradeModalTitle">Add New Trade</h2>
-            <form id="tradeForm">
+    <!-- Trade Modal -->
+    <div id="tradeModal" class="modal" role="dialog" aria-labelledby="tradeModalTitle" aria-modal="true">
+        <div class="card modal-content modal-content-lg">
+            <div class="modal-header">
+                <h2 id="tradeModalTitle">Add New Trade</h2>
+                <button class="modal-close-btn" onclick="UI.closeModal('tradeModal')" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="tradeForm" class="modal-body" novalidate>
                 <input type="hidden" id="editTradeId">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+                <div class="form-grid-2">
                     <div class="form-group">
-                        <label>Date</label>
+                        <label for="tradeDate">Date *</label>
                         <input type="date" id="tradeDate" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Pair</label>
+                        <label for="tradePair">Pair *</label>
                         <input type="text" id="tradePair" class="form-control" placeholder="XAUUSD" required>
                     </div>
                     <div class="form-group">
-                        <label>Timeframe</label>
-                        <input type="text" id="tradeTF" class="form-control" placeholder="M15" required>
+                        <label for="tradeTF">Timeframe *</label>
+                        <input type="text" id="tradeTF" class="form-control" placeholder="M15, H1, H4…" required>
                     </div>
                     <div class="form-group">
-                        <label>Direction</label>
+                        <label for="tradeDir">Direction</label>
                         <select id="tradeDir" class="form-control">
-                            <option value="Buy">Buy</option>
-                            <option value="Sell">Sell</option>
+                            <option value="Buy">Buy 📈</option>
+                            <option value="Sell">Sell 📉</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Entry Price</label>
-                        <input type="number" id="tradeEntry" class="form-control" step="any"
-                            oninput="app.updateTradeFormCalculations()" required>
+                        <label for="tradeLot">Lot Size *</label>
+                        <input type="number" id="tradeLot" class="form-control" step="0.01" min="0.01"
+                            placeholder="0.10" required>
                     </div>
                     <div class="form-group">
-                        <label>Close Price</label>
-                        <input type="number" id="tradeClose" class="form-control" step="any"
-                            oninput="app.updateTradeFormCalculations()">
+                        <label for="tradeRisk">Risk %</label>
+                        <input type="number" id="tradeRisk" class="form-control" step="0.1" min="0" placeholder="1.0">
                     </div>
-                    <div class="form-group">
-                        <label>Pips</label>
-                        <input type="number" id="tradePips" class="form-control" step="any" readonly placeholder="Auto">
-                    </div>
-                    <div class="form-group">
-                        <label>SL</label>
-                        <input type="number" id="tradeSL" class="form-control" step="any"
-                            oninput="app.updateTradeFormCalculations()">
-                    </div>
-                    <div class="form-group">
-                        <label>TP</label>
-                        <input type="number" id="tradeTP" class="form-control" step="any"
-                            oninput="app.updateTradeFormCalculations()">
-                    </div>
-                    <div class="form-group">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="mb-0">Result ($)</label>
-                            <label class="flex items-center gap-1"
-                                style="font-size: 0.75rem; cursor: pointer; color: var(--secondary);">
-                                <input type="checkbox" id="tradeManualResult" onchange="app.toggleResultMode()"> Manual
-                            </label>
-                        </div>
-                        <input type="number" id="tradeResult" class="form-control" step="any" readonly
-                            placeholder="Auto">
-                    </div>
-                    <div class="form-group">
-                        <label>Lot</label>
-                        <input type="number" id="tradeLot" class="form-control" step="any"
-                            oninput="app.updateTradeFormCalculations()" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Risk %</label>
-                        <input type="number" id="tradeRisk" class="form-control" step="any">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Emotion</label>
-                    <input type="text" id="tradeEmotion" class="form-control" placeholder="Calm, greedy, etc.">
-                </div>
-                <div class="form-group">
-                    <label>Notes</label>
-                    <textarea id="tradeNotes" class="form-control" rows="3"></textarea>
                 </div>
 
-                <div class="flex gap-2" style="margin-top: 2rem;">
-                    <button type="button" class="btn btn-outline" onclick="app.closeModal('tradeModal')">Cancel</button>
+                <div class="form-section-divider"><span>Price Levels</span></div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="tradeEntry">Entry Price *</label>
+                        <input type="number" id="tradeEntry" class="form-control" step="any" placeholder="2350.00"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeClose">Close Price</label>
+                        <input type="number" id="tradeClose" class="form-control" step="any" placeholder="Entry first"
+                            disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeSL">Stop Loss</label>
+                        <input type="number" id="tradeSL" class="form-control" step="any" placeholder="2340.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeTP">Take Profit</label>
+                        <input type="number" id="tradeTP" class="form-control" step="any" placeholder="2370.00">
+                    </div>
+                </div>
+
+                <div class="form-section-divider"><span>Calculated Output</span></div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="tradePips">Pips</label>
+                        <input type="text" id="tradePips" class="form-control calc-field" readonly placeholder="Auto">
+                    </div>
+                    <div class="form-group">
+                        <label for="tradeRR">R:R Ratio</label>
+                        <input type="text" id="tradeRR" class="form-control calc-field" readonly placeholder="Auto">
+                    </div>
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="tradeResult">Result ($)</label>
+                            <label class="toggle-label" for="tradeManualResult">
+                                <input type="checkbox" id="tradeManualResult" onchange="app.toggleResultMode()">
+                                <span class="toggle-text">Manual</span>
+                            </label>
+                        </div>
+                        <input type="number" id="tradeResult" class="form-control calc-field" readonly step="any"
+                            placeholder="Auto">
+                    </div>
+                </div>
+
+                <div class="form-section-divider"><span>Notes</span></div>
+
+                <div class="form-group">
+                    <label for="tradeEmotion">Emotion / Psychology</label>
+                    <input type="text" id="tradeEmotion" class="form-control" placeholder="Calm, FOMO, Disciplined…">
+                </div>
+                <div class="form-group">
+                    <label for="tradeNotes">Notes</label>
+                    <textarea id="tradeNotes" class="form-control" rows="3"
+                        placeholder="Trade rationale, observations…"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="UI.closeModal('tradeModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="tradeModalSubmit">Save Trade</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Confirm Dialog Modal -->
+    <div id="confirmModal" class="modal" role="dialog" aria-modal="true">
+        <div class="card modal-content modal-content-sm">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle" style="color:var(--warning);margin-right:8px;"></i>Confirm
+                    Action</h2>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage" style="color:var(--text-secondary);line-height:1.6;"></p>
+                <div class="modal-actions" style="margin-top:1.5rem;">
+                    <button class="btn btn-outline" id="confirmNo">Cancel</button>
+                    <button class="btn btn-danger" id="confirmYes">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts: order matters -->
+    <script src="js/calculations.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>
