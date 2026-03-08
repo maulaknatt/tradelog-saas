@@ -379,6 +379,7 @@ select.form-control {
 
 select.form-control option {
     background: var(--bg-card);
+    padding: 0.5rem;
 }
 
 textarea.form-control {
