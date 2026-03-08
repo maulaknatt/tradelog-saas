@@ -489,8 +489,8 @@ const app = {
         this._setText('stat-drawdown', `${s.drawdown.toFixed(2)}%`);
         this._setText('stat-profit-factor', s.profitFactor === Infinity ? '∞' : s.profitFactor.toFixed(2));
         this._setText('stat-avg-rr', s.avgRR ? `1 : ${s.avgRR}` : '-');
-        this._setText('stat-win-streak', `${s.maxWinStreak}`);
-        this._setText('stat-loss-streak', `${s.maxLossStreak}`);
+        this._setText('stat-win-streak', `${s.wins}`);
+        this._setText('stat-loss-streak', `${s.losses}`);
 
         this.renderRecentTrades(trades);
         this.updateAccountSelectors();
@@ -607,7 +607,8 @@ const app = {
             return;
         }
 
-        list.innerHTML = this.state.accounts.map(acc => {
+        const sortedAccounts = [...this.state.accounts].sort((a, b) => b.id.localeCompare(a.id));
+        list.innerHTML = sortedAccounts.map(acc => {
             const accTrades = this.state.trades.filter(t => t.accountId === acc.id);
             const s = Calc.stats(accTrades, acc.initialBalance);
             const growthCls = s.growth >= 0 ? 'text-success' : 'text-danger';
