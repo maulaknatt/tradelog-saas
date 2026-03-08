@@ -871,8 +871,9 @@ const app = {
             ? this.state.accounts
             : this.state.accounts.filter(a => a.type === this.state.activeTypeFilter);
 
+        const sortedAccounts = [...filtered].sort((a, b) => b.id.localeCompare(a.id));
         select.innerHTML = '<option value="all">All Accounts</option>' +
-            filtered.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            sortedAccounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
 
         if (filtered.find(a => a.id === cur)) select.value = cur;
         else this.state.activeAccountId = 'all';
