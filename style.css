@@ -1062,6 +1062,44 @@ textarea.form-control {
     margin-bottom: 2rem;
 }
 
+#accountsList {
+    max-height: calc(2 * 400px + 1.5rem);
+    /* Generous estimate for 2 rows to prevent early scrollbar */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+    /* Room for scrollbar */
+}
+
+/* Custom scrollbar for accounts list */
+#accountsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#accountsList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#accountsList::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: 4px;
+}
+
+#accountsList::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+@media (max-width: 1024px) {
+    #accountsList {
+        max-height: calc(3 * 400px + 2 * 1.5rem);
+    }
+}
+
+@media (max-width: 767px) {
+    #accountsList {
+        max-height: calc(6 * 400px + 5 * 1rem);
+    }
+}
 
 .account-card {
     padding: 1.75rem;
