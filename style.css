@@ -1063,8 +1063,8 @@ textarea.form-control {
 }
 
 #accountsList {
-    max-height: calc(2 * 340px + 1 * 1.5rem);
-    /* Approx 2 rows for 6 cards */
+    max-height: calc(2 * 400px + 1.5rem);
+    /* Generous estimate for 2 rows to prevent early scrollbar */
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.5rem;
@@ -1091,15 +1091,13 @@ textarea.form-control {
 
 @media (max-width: 1024px) {
     #accountsList {
-        max-height: calc(3 * 340px + 2 * 1.5rem);
-        /* Approx 3 rows for up to 6 cards (2 cols) */
+        max-height: calc(3 * 400px + 2 * 1.5rem);
     }
 }
 
 @media (max-width: 767px) {
     #accountsList {
-        max-height: calc(6 * 340px + 5 * 1rem);
-        /* 6 rows for 6 cards (1 col) */
+        max-height: calc(6 * 400px + 5 * 1rem);
     }
 }
 
