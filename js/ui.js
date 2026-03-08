@@ -105,7 +105,10 @@ const UI = (() => {
     }
 
     function updateCharts(trades, initialBalance) {
-        const sorted = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sorted = [...trades].sort((a, b) => {
+            const dateDiff = new Date(a.date) - new Date(b.date);
+            return dateDiff !== 0 ? dateDiff : a.id.localeCompare(b.id);
+        });
 
         if (charts.equity) {
             let cumulative = initialBalance;

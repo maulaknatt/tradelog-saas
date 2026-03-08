@@ -62,7 +62,10 @@ const Calc = (() => {
      * Equity curve is cumulative: equity[i] = equity[i-1] + result[i]
      */
     function stats(trades, initialBalance) {
-        const sorted = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sorted = [...trades].sort((a, b) => {
+            const dateDiff = new Date(a.date) - new Date(b.date);
+            return dateDiff !== 0 ? dateDiff : a.id.localeCompare(b.id);
+        });
 
         let balance = initialBalance;
         let peak = initialBalance;

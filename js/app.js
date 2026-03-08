@@ -535,7 +535,10 @@ const app = {
         if (!tbody) return;
 
         const recent = [...trades]
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .sort((a, b) => {
+                const dateDiff = new Date(b.date) - new Date(a.date);
+                return dateDiff !== 0 ? dateDiff : b.id.localeCompare(a.id);
+            })
             .slice(0, 8);
 
         if (recent.length === 0) {
@@ -712,7 +715,10 @@ const app = {
         const tbody = document.querySelector('#journalTable tbody');
         if (!tbody) return;
 
-        const sorted = [...accTrades].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sorted = [...accTrades].sort((a, b) => {
+            const dateDiff = new Date(b.date) - new Date(a.date);
+            return dateDiff !== 0 ? dateDiff : b.id.localeCompare(a.id);
+        });
         const total = sorted.length;
         const perPage = this.state.pagination.itemsPerPage;
         const pages = Math.max(1, Math.ceil(total / perPage));
@@ -783,7 +789,10 @@ const app = {
         const ctx = document.getElementById('journalEquityChart')?.getContext('2d');
         if (!ctx) return;
 
-        const sorted = [...trades].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sorted = [...trades].sort((a, b) => {
+            const dateDiff = new Date(a.date) - new Date(b.date);
+            return dateDiff !== 0 ? dateDiff : a.id.localeCompare(b.id);
+        });
         let bal = acc.initialBalance;
         const labels = ['Start'];
         const data = [bal];
